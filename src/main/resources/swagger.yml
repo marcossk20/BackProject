@@ -1,0 +1,200 @@
+openapi: 3.0.1
+info:
+  title: API de Gerenciamento de Consultas Médicas
+  version: v1
+  description: Esta API permite o gerenciamento de usuários e consultas em um sistema de agendamento médico, facilitando a busca, atualização e exclusão de informações.
+
+servers:
+  - url: http://localhost:8080
+    description: URL do servidor local utilizado durante o desenvolvimento e testes.
+
+paths:
+  /usuarios/{id}:
+    get:
+      tags:
+        - usuario-resource
+      summary: Recuperar informações de um usuário
+      description: Este endpoint permite buscar os detalhes de um usuário específico pelo seu ID. Utilizado para verificar informações do usuário antes de realizar outras operações.
+      operationId: buscarUsuario
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: O ID único do usuário que deseja buscar.
+          schema:
+            type: integer
+            format: int64
+      responses:
+        "200":
+          description: Usuário encontrado com sucesso. Retorna os dados do usuário.
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/Usuario"
+        "404":
+          description: O usuário com o ID fornecido não foi encontrado.
+
+    put:
+      tags:
+        - usuario-resource
+      summary: Atualizar informações de um usuário
+      description: Atualiza os dados de um usuário existente utilizando seu ID. É utilizado para modificar informações como nome e e-mail.
+      operationId: atualizarUsuario
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: O ID do usuário que será atualizado.
+          schema:
+            type: integer
+            format: int64
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Usuario"
+        required: true
+      responses:
+        "200":
+          description: Usuário atualizado com sucesso. Retorna os novos dados do usuário.
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/Usuario"
+        "404":
+          description: O usuário com o ID fornecido não foi encontrado.
+        "400":
+          description: A requisição está mal formada ou faltam dados obrigatórios.
+
+    delete:
+      tags:
+        - usuario-resource
+      summary: Excluir um usuário
+      description: Este endpoint remove um usuário do sistema baseado em seu ID. É utilizado quando um usuário não é mais necessário ou deseja ser removido.
+      operationId: deletarUsuario
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: O ID do usuário que será excluído.
+          schema:
+            type: integer
+            format: int64
+      responses:
+        "200":
+          description: Usuário deletado com sucesso. Não retorna conteúdo.
+        "404":
+          description: O usuário com o ID fornecido não foi encontrado.
+
+  /consulta/atualizar/{id}:
+    put:
+      tags:
+        - consulta-resource
+      summary: Atualizar detalhes de uma consulta
+      description: Atualiza as informações de uma consulta existente utilizando seu ID. Permite modificar a data, descrição e outros detalhes relacionados à consulta.
+      operationId: atualizarConsulta
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: O ID da consulta que será atualizada.
+          schema:
+            type: integer
+            format: int64
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Consulta"
+        required: true
+      responses:
+        "200":
+          description: Consulta atualizada com sucesso. Retorna os novos detalhes da consulta.
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/Consulta"
+        "404":
+          description: A consulta com o ID fornecido não foi encontrada.
+        "400":
+          description: A requisição está mal formada ou faltam dados obrigatórios.
+
+  /consulta/{id}:
+    get:
+      tags:
+        - consulta-resource
+      summary: Recuperar informações de uma consulta
+      description: Permite buscar os detalhes de uma consulta específica utilizando seu ID. Utilizado para verificar informações antes de realizar outras operações.
+      operationId: buscarConsulta
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: O ID único da consulta que deseja buscar.
+          schema:
+            type: integer
+            format: int64
+      responses:
+        "200":
+          description: Consulta encontrada com sucesso. Retorna os dados da consulta.
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/Consulta"
+        "404":
+          description: A consulta com o ID fornecido não foi encontrada.
+
+    delete:
+      tags:
+        - consulta-resource
+      summary: Excluir uma consulta
+      description: Remove uma consulta do sistema baseada no ID fornecido. Utilizado quando a consulta não é mais necessária.
+      operationId: deletarConsulta
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: O ID da consulta que será excluída.
+          schema:
+            type: integer
+            format: int64
+      responses:
+        "200":
+          description: Consulta deletada com sucesso. Não retorna conteúdo.
+        "404":
+          description: A consulta com o ID fornecido não foi encontrada.
+
+components:
+  schemas:
+    Usuario:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+          description: ID único do usuário no sistema.
+        nome:
+          type: string
+          description: Nome completo do usuário, utilizado para identificação.
+        email:
+          type: string
+          description: Endereço de e-mail do usuário, utilizado para comunicações.
+
+    Consulta:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+          description: ID único da consulta no sistema.
+        data:
+          type: string
+          format: date-time
+          description: Data e hora agendada da consulta, em formato ISO 8601.
+        usuarioId:
+          type: integer
+          format: int64
+          description: ID do usuário associado à consulta.
+        descricao:
+          type: string
+          description: Descrição ou observações relevantes sobre a consulta.
